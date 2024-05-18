@@ -8,18 +8,20 @@
         <artifactId>asteroids.jpms</artifactId>
         <version>1.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>Asteroids</artifactId>
+
+    <artifactId>Enemy</artifactId>
     <packaging>jar</packaging>
     <dependencies>
-            <dependency>
-            <groupId>${project.groupId}</groupId>
+        <dependency>
+            <groupId>dk.sdu.mmmi.cbse</groupId>
             <artifactId>Common</artifactId>
-            <version>${project.version}</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>CommonAsteroids</artifactId>
-            <version>${project.version}</version>
+            <groupId>dk.sdu.mmmi.cbse</groupId>
+            <artifactId>CommonBullet</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
+
 </project>

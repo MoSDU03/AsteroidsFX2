@@ -66,18 +66,22 @@ public class Main extends Application {
             if (event.getCode().equals(KeyCode.SPACE)) {
                 gameData.getKeys().setKey(GameKeys.SPACE, false);
             }
-
         });
 
         // Lookup all Game Plugins using ServiceLoader
+        System.out.println("Loading game plugins...");
         for (IGamePluginService iGamePlugin : getPluginServices()) {
+            System.out.println("Starting plugin: " + iGamePlugin.getClass().getName());
             iGamePlugin.start(gameData, world);
         }
+        System.out.println("Plugins started, initializing entities...");
         for (Entity entity : world.getEntities()) {
             Polygon polygon = new Polygon(entity.getPolygonCoordinates());
             polygons.put(entity, polygon);
             gameWindow.getChildren().add(polygon);
+            System.out.println("Entity added: " + entity.getID());
         }
+        System.out.println("Entities initialized.");
         render();
         window.setScene(scene);
         window.setTitle("ASTEROIDS");
@@ -102,19 +106,19 @@ public class Main extends Application {
         }
         for (IPostEntityProcessingService postEntityProcessorService : getPostEntityProcessingServices()) {
             postEntityProcessorService.process(gameData, world);
-        }       
+        }
     }
 
-    private void draw() {        
+    private void draw() {
         for (Entity polygonEntity : polygons.keySet()) {
-            if(!world.getEntities().contains(polygonEntity)){   
-                Polygon removedPolygon = polygons.get(polygonEntity);               
-                polygons.remove(polygonEntity);                      
+            if(!world.getEntities().contains(polygonEntity)){
+                Polygon removedPolygon = polygons.get(polygonEntity);
+                polygons.remove(polygonEntity);
                 gameWindow.getChildren().remove(removedPolygon);
             }
         }
-                
-        for (Entity entity : world.getEntities()) {                      
+
+        for (Entity entity : world.getEntities()) {
             Polygon polygon = polygons.get(entity);
             if (polygon == null) {
                 polygon = new Polygon(entity.getPolygonCoordinates());
@@ -125,7 +129,6 @@ public class Main extends Application {
             polygon.setTranslateY(entity.getY());
             polygon.setRotate(entity.getRotation());
         }
-
     }
 
     private Collection<? extends IGamePluginService> getPluginServices() {
