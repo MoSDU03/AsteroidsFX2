@@ -1,9 +1,5 @@
 package dk.sdu.mmmi.cbse.main;
 
-import java.lang.module.Configuration;
-import java.lang.module.ModuleFinder;
-import java.nio.file.Paths;
-import java.util.Set;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.GameKeys;
@@ -167,30 +163,14 @@ public class Main extends Application {
     }
 
     private Collection<? extends IGamePluginService> getPluginServices() {
-        //creating a ModuleLayer to load plugins from the plugins folder
-        ModuleFinder finder = ModuleFinder.of(Paths.get("plugins"));
-        ModuleLayer parent = ModuleLayer.boot();
-        Configuration configuration = parent.configuration().resolve(finder, ModuleFinder.of(), Set.of("CommonAsteroids"));
-        ModuleLayer layer = parent.defineModulesWithOneLoader(configuration, ClassLoader.getSystemClassLoader());
-
         return ServiceLoader.load(IGamePluginService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
     private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {
-
-        ModuleFinder finder = ModuleFinder.of(Paths.get("plugins"));
-        ModuleLayer parent = ModuleLayer.boot();
-        Configuration configuration = parent.configuration().resolve(finder, ModuleFinder.of(), Set.of("CommonAsteroids"));
-        ModuleLayer layer = parent.defineModulesWithOneLoader(configuration, ClassLoader.getSystemClassLoader());
         return ServiceLoader.load(IEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
     private Collection<? extends IPostEntityProcessingService> getPostEntityProcessingServices() {
-
-        ModuleFinder finder = ModuleFinder.of(Paths.get("plugins"));
-        ModuleLayer parent = ModuleLayer.boot();
-        Configuration configuration = parent.configuration().resolve(finder, ModuleFinder.of(), Set.of("CommonAsteroids"));
-        ModuleLayer layer = parent.defineModulesWithOneLoader(configuration, ClassLoader.getSystemClassLoader());
         return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
     private void initializeHealthBars() {
