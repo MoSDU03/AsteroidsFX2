@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import static java.util.stream.Collectors.toList;
+
+import dk.sdu.mmmi.cbse.enemy.Enemy;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -20,6 +22,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+
 
 public class Main extends Application {
 
@@ -27,6 +32,8 @@ public class Main extends Application {
     private final World world = new World();
     private final Map<Entity, Polygon> polygons = new ConcurrentHashMap<>();
     private final Pane gameWindow = new Pane();
+    private final Map<Entity, Rectangle> healthBars = new ConcurrentHashMap<>();
+
 
     public static void main(String[] args) {
         launch(Main.class);
@@ -75,11 +82,17 @@ public class Main extends Application {
             iGamePlugin.start(gameData, world);
         }
         System.out.println("Plugins started, initializing entities...");
+        initializeHealthBars();
         for (Entity entity : world.getEntities()) {
             Polygon polygon = new Polygon(entity.getPolygonCoordinates());
             polygons.put(entity, polygon);
             gameWindow.getChildren().add(polygon);
             System.out.println("Entity added: " + entity.getID());
+            if (entity instanceof Enemy) {
+                Rectangle healthBar = new Rectangle(50, 5, Color.RED);
+                healthBars.put(entity, healthBar);
+                gameWindow.getChildren().add(healthBar);
+            }
         }
         System.out.println("Entities initialized.");
         render();
@@ -111,10 +124,16 @@ public class Main extends Application {
 
     private void draw() {
         for (Entity polygonEntity : polygons.keySet()) {
-            if(!world.getEntities().contains(polygonEntity)){
+            if (!world.getEntities().contains(polygonEntity)) {
                 Polygon removedPolygon = polygons.get(polygonEntity);
                 polygons.remove(polygonEntity);
                 gameWindow.getChildren().remove(removedPolygon);
+
+                if (polygonEntity instanceof Enemy) {
+                    Rectangle removedHealthBar = healthBars.get(polygonEntity);
+                    healthBars.remove(polygonEntity);
+                    gameWindow.getChildren().remove(removedHealthBar);
+                }
             }
         }
 
@@ -128,6 +147,18 @@ public class Main extends Application {
             polygon.setTranslateX(entity.getX());
             polygon.setTranslateY(entity.getY());
             polygon.setRotate(entity.getRotation());
+
+            if (entity instanceof Enemy) {
+                Rectangle healthBar = healthBars.get(entity);
+                if (healthBar == null) {
+                    healthBar = new Rectangle(50, 5, Color.RED);
+                    healthBars.put(entity, healthBar);
+                    gameWindow.getChildren().add(healthBar);
+                }
+                healthBar.setTranslateX(entity.getX() - 25);
+                healthBar.setTranslateY(entity.getY() - 35);
+                healthBar.setWidth(((Enemy) entity).getHealth() * 10);
+            }
         }
     }
 
@@ -141,5 +172,12 @@ public class Main extends Application {
 
     private Collection<? extends IPostEntityProcessingService> getPostEntityProcessingServices() {
         return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    }
+    private void initializeHealthBars() {
+        for (Entity entity : world.getEntities(Enemy.class)) {
+            Rectangle healthBar = new Rectangle(50, 5, Color.RED);
+            healthBars.put(entity, healthBar);
+            gameWindow.getChildren().add(healthBar);
+        }
     }
 }

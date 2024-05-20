@@ -10,6 +10,7 @@ import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 public class AsteroidProcessor implements IEntityProcessingService {
 
     private IAsteroidSplitter asteroidSplitter = new AsteroidSplitterImpl();
+    private static final float INITIAL_ASTEROID_RADIUS = 20;
 
     @Override
     public void process(GameData gameData, World world) {
@@ -35,6 +36,9 @@ public class AsteroidProcessor implements IEntityProcessingService {
 
             if (asteroid.getY() > gameData.getDisplayHeight()) {
                 asteroid.setY(asteroid.getY() % gameData.getDisplayHeight());
+            }
+            if (asteroid.getRadius() == 0) {
+                asteroid.setRadius(INITIAL_ASTEROID_RADIUS);
             }
 
         }
